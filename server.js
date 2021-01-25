@@ -16,7 +16,7 @@ app.use('/', (req, res) => {
 
 io.on('connection', socket => {
     console.log(`Conectado ${socket.id}`);
-
+    socket.emit('conectou', socket.id);
 });
 
 server.listen(port, ipadress, () => {

@@ -4,9 +4,12 @@ const ctx = scr.getContext('2d');
 const WIDTH = scr.width;
 const HEIGHT = scr.height;
 const game = createGame(scr);
-const keyboard = createKeyboardListener();
+const keyboard = createKeyboardListener('player1'); 
 
-keyboard.subscribe(game.movePlayer);
+
+
+
+keyboard.subscribe(game.movePlayer); 
 renderScreen();
 
 function renderScreen () {

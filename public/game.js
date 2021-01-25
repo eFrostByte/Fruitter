@@ -1,10 +1,6 @@
 function createGame(scr){
     const state = {
-        players:{
-            'player1': {x:1, y:3},
-            'player2': {x:3, y:1},
-            'player3': {x:9, y:9},
-        },
+        players:{},
         fruits:{},
         scr
     };
