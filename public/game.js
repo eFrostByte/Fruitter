@@ -1,13 +1,13 @@
 function createGame(scr){
     const state = {
-        players:{
-            'player1': {x:1, y:3},
-            'player2': {x:3, y:1},
-            'player3': {x:9, y:9},
-        },
+        players:{},
         fruits:{},
         scr
     };
+
+    function setState(newState){
+        Object.assign(state, newState);
+    }
 
     function addPlayer(command){
         playerX = 'x' in command ? command.x : Math.floor(Math.random()*state.scr.width)
@@ -54,10 +54,12 @@ function createGame(scr){
 
 
 
+
     return {
         state,
         addPlayer,
         removePlayer,
-        movePlayer
+        movePlayer,
+        setState
     }
 }
