@@ -6,22 +6,44 @@ const HEIGHT = scr.height;
 const game = createGame(scr);
 const keyboard = createKeyboardListener(document); 
 
-socket.on('setup', socketId => {
-    game.addPlayer({playerId: socketId});
-    keyboard.registerPlayerId(socketId);
+/* socket.on('connect', () => {
+    console.log(socket.id);
+}) */
+
+socket.on('setup', state => {
+    game.addPlayer({playerId: socket.id});
+    keyboard.registerPlayerId(socket.id);
+    game.setState(state);
 });
+
+socket.on('update', state => {
+    game.setState(state);
+})
 
 
 keyboard.subscribe(game.movePlayer); 
+keyboard.subscribe((command) => {
+    socket.emit('move-player', command)
+})
 renderScreen();
 
 function renderScreen () {
     ctx.fillStyle = 'white'
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
-    ctx.fillStyle = 'black'
+    
     for(let playerId in game.state.players){
         const player = game.state.players[playerId];
+        if(playerId == socket.id){
+            ctx.fillStyle = 'yellow';
+        }else{
+            ctx.fillStyle = 'rgba(64, 64, 64, 0.1)'
+        }
         ctx.fillRect(player.x, player.y, 1, 1);
+    }
+    for(let fruitId in game.state.fruits){
+        const fruit = game.state.fruits[fruitId];
+        ctx.fillStyle = '#ff00ff';
+        ctx.fillRect(fruit.x, fruit.y, 1, 1);
     }
 
 

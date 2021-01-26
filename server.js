@@ -2,17 +2,32 @@ function createGame(scr){
     const state = {
         players:{},
         fruits:{},
-        scr
+        scr,
+        update: null
     };
+
+    function start(){
+        const interval = 5000;
+        setInterval(() => {
+            addFruit({})
+        }, interval);
+        console.log('The game has started!');
+    }
+
+    function setUpdate(newUpdate){
+        state.update = newUpdate;
+    }
 
     function addPlayer(command){
         playerX = 'x' in command ? command.x : Math.floor(Math.random()*state.scr.width)
         playerY = 'y' in command ? command.y : Math.floor(Math.random()*state.scr.height)
         state.players[command.playerId] = {x:playerX, y:playerY};
+        if(state.update){state.update({state})}
     }
 
     function removePlayer(playerId){
         delete state.players[playerId];
+        if(state.update){state.update({state})}
     }
 
     function movePlayer(command){
@@ -45,16 +60,36 @@ function createGame(scr){
 
         if(moveFunction && player){
             moveFunction(player);
+            if(state.update){state.update({state})}
         }
     }
 
+    function addFruit(command){
+        const xx = 'x' in command ? command.x : Math.floor(Math.random()*state.scr.width);
+        const yy = 'y' in command ? command.y : Math.floor(Math.random()*state.scr.height);
+        const fruitId = `${xx}|${yy}`;
+        state.fruits[fruitId] = {x: xx, y: yy};
+        if(state.update){state.update({state})}
+    }
+    
+    function removeFruit(fruitId){
+        delete state.fruits[fruitId];
+        if(state.update){state.update({state})}
+    }
+
+    
+    
 
 
     return {
         state,
+        start,
         addPlayer,
         removePlayer,
-        movePlayer
+        movePlayer,
+        addFruit,
+        removeFruit,
+        setUpdate
     }
 }
 
@@ -65,6 +100,15 @@ const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const ipadress = '192.168.15.24';
 const port = 3000;
+const width = 10;
+const height = 10;
+const game = createGame({width, height})
+game.setUpdate((command) => {
+    io.emit('update', command.state);
+})
+game.start();
+
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('views', path.join(__dirname, 'public'));
@@ -75,8 +119,31 @@ app.use('/', (req, res) => {
 });
 
 io.on('connection', socket => {
-    console.log(`Conectado ${socket.id}`);
-    socket.emit('setup', socket.id);
+    const playerId = socket.id;
+    function update(){
+        socket.broadcast.emit('update', game.state);
+    }
+
+    function start(){
+        setInterval(() => {
+            addFruit({});
+        }, 4000);
+    }
+
+    socket.on('add-fruit', () => {})
+
+    console.log(`Conectado ${playerId}`);
+    game.addPlayer({playerId: playerId})
+    socket.emit('setup', game.state);
+    update();
+    socket.on('disconnect', () => {
+        console.log(`Desconectado ${playerId}`);
+        game.removePlayer(playerId);
+        update();
+    });
+    socket.on('move-player', command => {
+        game.movePlayer(command);
+    });
 });
 
 server.listen(port, ipadress, () => {

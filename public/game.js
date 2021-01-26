@@ -5,6 +5,10 @@ function createGame(scr){
         scr
     };
 
+    function setState(newState){
+        Object.assign(state, newState);
+    }
+
     function addPlayer(command){
         playerX = 'x' in command ? command.x : Math.floor(Math.random()*state.scr.width)
         playerY = 'y' in command ? command.y : Math.floor(Math.random()*state.scr.height)
@@ -50,10 +54,12 @@ function createGame(scr){
 
 
 
+
     return {
         state,
         addPlayer,
         removePlayer,
-        movePlayer
+        movePlayer,
+        setState
     }
 }
