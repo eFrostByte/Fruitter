@@ -3,8 +3,20 @@ function createGame(scr){
         players:{},
         fruits:{},
         scr,
-        update: null
+        update: null,
     };
+
+    function checkForFruitCollision(playerId){
+        for(let fruitId in state.fruits){
+            const fruit = state.fruits[fruitId]
+            const player = state.players[playerId]
+            if(player.x == fruit.x && player.y == fruit.y){
+                removeFruit(fruitId);
+                state.players[playerId].score += 1;
+                if(state.update){state.update({state})}
+            }
+        }
+    }
 
     function start(){
         const interval = 5000;
@@ -21,7 +33,7 @@ function createGame(scr){
     function addPlayer(command){
         playerX = 'x' in command ? command.x : Math.floor(Math.random()*state.scr.width)
         playerY = 'y' in command ? command.y : Math.floor(Math.random()*state.scr.height)
-        state.players[command.playerId] = {x:playerX, y:playerY};
+        state.players[command.playerId] = {x:playerX, y:playerY, score:0};
         if(state.update){state.update({state})}
     }
 
@@ -60,7 +72,8 @@ function createGame(scr){
 
         if(moveFunction && player){
             moveFunction(player);
-            if(state.update){state.update({state})}
+            checkForFruitCollision(command.playerId);
+            if(state.update){state.update({state})};
         }
     }
 
@@ -89,7 +102,7 @@ function createGame(scr){
         movePlayer,
         addFruit,
         removeFruit,
-        setUpdate
+        setUpdate,
     }
 }
 
@@ -106,6 +119,7 @@ const game = createGame({width, height})
 game.setUpdate((command) => {
     io.emit('update', command.state);
 })
+
 game.start();
 
 

@@ -6,9 +6,9 @@ const HEIGHT = scr.height;
 const game = createGame(scr);
 const keyboard = createKeyboardListener(document); 
 
-/* socket.on('connect', () => {
+socket.on('connect', () => {
     console.log(socket.id);
-}) */
+})
 
 socket.on('setup', state => {
     game.addPlayer({playerId: socket.id});
