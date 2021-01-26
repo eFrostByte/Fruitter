@@ -4,9 +4,12 @@ const ctx = scr.getContext('2d');
 const WIDTH = scr.width;
 const HEIGHT = scr.height;
 const game = createGame(scr);
-const keyboard = createKeyboardListener('player1'); 
+const keyboard = createKeyboardListener(document); 
 
-
+socket.on('setup', socketId => {
+    game.addPlayer({playerId: socketId});
+    keyboard.registerPlayerId(socketId);
+});
 
 
 keyboard.subscribe(game.movePlayer); 
