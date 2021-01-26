@@ -1,3 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap');
+*{
+	box-sizing: border-box;
+}
 canvas{
 	border: 10px solid #CCC;
 	image-rendering: pixelated;
@@ -5,4 +9,34 @@ canvas{
 	image-rendering: -moz-crisp-edges;
 	width: 400px;
 	height: 400px;
+	margin: 10px;
+	float: left;
 }
+
+#aside{
+
+	justify-content: left;
+	height: 100vh;
+	position: relative;
+	/* display: inline-block; */
+	margin: 30px;
+	float: left;
+}
+
+#scorediv{
+	position: absolute;
+	top: -30px;
+	left: -10px;
+	width: 300px;
+}
+
+.game{
+	justify-content:  space-between;
+}
+
+#scorediv h2{
+	font-size: 2rem;
+	font-family: 'Roboto', sans-serif;
+}
+
+
