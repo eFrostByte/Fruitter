@@ -129,8 +129,8 @@ const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const ipadress = '192.168.15.24';
 const port = 3000;
-const width = 10;
-const height = 10;
+const width = 15; /* GAME WIDTH */
+const height = 15; /*  GAME HEIGHT */
 const game = createGame({width, height})
 game.setNotify((string, data) => {
     io.emit(string, data);

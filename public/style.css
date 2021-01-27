@@ -1,4 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap');
+
+:root{
+	--canvassize: 550px; /* CANVAS SIZE */
+}
+
 *{
 	box-sizing: border-box;
 }
@@ -7,8 +12,8 @@ canvas{
 	image-rendering: pixelated;
 	image-rendering: crisp-edges;
 	image-rendering: -moz-crisp-edges;
-	width: 400px;
-	height: 400px;
+	width: var(--canvassize);
+	height: var(--canvassize);
 	margin: 10px;
 	float: left;
 }
@@ -27,7 +32,7 @@ canvas{
 	position: absolute;
 	top: -30px;
 	left: -10px;
-	width: 400px;
+	width: 650px;
 }
 
 .game{

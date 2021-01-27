@@ -1,8 +1,8 @@
 const socket = io('http://192.168.15.24:3000');
 const scr = document.getElementById('scr');
 const ctx = scr.getContext('2d');
-const WIDTH = scr.width;
-const HEIGHT = scr.height;
+let WIDTH = scr.width;
+let HEIGHT = scr.height;
 const game = createGame(scr);
 const keyboard = createKeyboardListener(document); 
 
@@ -31,6 +31,10 @@ socket.on('setup', state => {
     for(let playerId in game.state.players){
         appendPlayer(playerId);
     }
+    document.getElementById('scr').width = state.scr.width;
+    WIDTH = state.scr.width;
+    document.getElementById('scr').height = state.scr.height;
+    HEIGHT = state.scr.height;
 });
 
 socket.on('update', state => {
