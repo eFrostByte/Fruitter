@@ -1,10 +1,16 @@
 function createGame(scr){
     const state = {
         players:{},
+        numberOfPlayers:0,
         fruits:{},
         scr,
         update: null,
+        notify: null,
     };
+
+    function setNotify(newN){
+        state.notify = newN;
+    }
 
     function checkForFruitCollision(playerId){
         for(let fruitId in state.fruits){
@@ -13,7 +19,8 @@ function createGame(scr){
             if(player.x == fruit.x && player.y == fruit.y){
                 removeFruit(fruitId);
                 state.players[playerId].score += 1;
-                if(state.update){state.update({state})}
+                if(state.update){state.update({state, type:'player-score'})}
+                if(state.notify){state.notify('add-score', playerId)}
             }
         }
     }
@@ -21,7 +28,11 @@ function createGame(scr){
     function start(){
         const interval = 5000;
         setInterval(() => {
-            addFruit({})
+            if(state.numberOfPlayers > 0){
+                addFruit({})
+            }else{
+                console.log('Fruit not added as there is no players');
+            }
         }, interval);
         console.log('The game has started!');
     }
@@ -34,12 +45,16 @@ function createGame(scr){
         playerX = 'x' in command ? command.x : Math.floor(Math.random()*state.scr.width)
         playerY = 'y' in command ? command.y : Math.floor(Math.random()*state.scr.height)
         state.players[command.playerId] = {x:playerX, y:playerY, score:0};
-        if(state.update){state.update({state})}
+        state.numberOfPlayers ++;
+        if(state.update){state.update({state, type:'add-player'})}
+        if(state.notify){state.notify('add-client-player', command.playerId)}
     }
 
     function removePlayer(playerId){
         delete state.players[playerId];
-        if(state.update){state.update({state})}
+        state.numberOfPlayers --;
+        if(state.update){state.update({state, type:'remove-player'})}
+        if(state.notify){state.notify('remove-client-player', playerId)}
     }
 
     function movePlayer(command){
@@ -73,7 +88,7 @@ function createGame(scr){
         if(moveFunction && player){
             moveFunction(player);
             checkForFruitCollision(command.playerId);
-            if(state.update){state.update({state})};
+            if(state.update){state.update({state, type:'move-player'})};
         }
     }
 
@@ -82,12 +97,12 @@ function createGame(scr){
         const yy = 'y' in command ? command.y : Math.floor(Math.random()*state.scr.height);
         const fruitId = `${xx}|${yy}`;
         state.fruits[fruitId] = {x: xx, y: yy};
-        if(state.update){state.update({state})}
+        if(state.update){state.update({state, type:'add-fruit'})}
     }
     
     function removeFruit(fruitId){
         delete state.fruits[fruitId];
-        if(state.update){state.update({state})}
+        if(state.update){state.update({state, type:'remove-fruit'})}
     }
 
     
@@ -103,6 +118,7 @@ function createGame(scr){
         addFruit,
         removeFruit,
         setUpdate,
+        setNotify,
     }
 }
 
@@ -116,10 +132,12 @@ const port = 3000;
 const width = 10;
 const height = 10;
 const game = createGame({width, height})
+game.setNotify((string, data) => {
+    io.emit(string, data);
+})
 game.setUpdate((command) => {
     io.emit('update', command.state);
 })
-
 game.start();
 
 
